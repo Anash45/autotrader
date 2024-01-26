@@ -1,0 +1,169 @@
+<?php
+session_start();
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/general.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/queries.css" />
+    <script src="css/auto.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule="" src="https://unpkg.com/ionicons@5.4.0/dist/ionicons/ionicons.js"></script>
+    <title>AutoTrader</title>
+    <style>
+      #searchbar {
+        margin: 10px;
+        padding: 10px;
+        border-radius: 5px;
+        width: 50%;
+        box-sizing: border-box;
+      }
+
+      #list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .cars {
+        font-size: 1.2em;
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+      }
+
+      .cars:last-child {
+        border-bottom: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <?php 
+    include_once 'header.php';
+    ?>
+    <main>
+      <div class="container">
+        <form class="cts-form">
+          <input id="searchbar" type="text" class="cts-text-box" placeholder="Search..." oninput="search_car()">
+        </form>
+        <section class="section-cars">
+        <div class="container grid grid--3-cols">
+          <?php
+          // Include the database connection file (db_conn.php)
+          include('db_conn.php');
+
+          // Fetch cars with car_type = 'New'
+          $query = "SELECT * FROM autos ";
+          $result = $conn->query($query);
+
+          // Check if cars are found
+          if ($result->num_rows > 0) {
+            // Loop through the result set and display each car
+            while ($row = $result->fetch_assoc()) {
+              echo '<div class="car-box cars">';
+              echo '<img src="' . $row['car_image'] . '" class="car-img" alt="' . $row['car_make'] . ' ' . $row['car_model'] . '" />';
+              echo '<h3 class="heading-tertiary car-name">' . $row['car_make'] . ' ' . $row['car_model'] . ' - ' . $row['year'] . '</h3>';
+              echo '<p class="car-type car-'.$row['car_type'].'">' . $row['car_type'] . '</p>';
+              echo '<p class="car-price">$' . $row['price'] . '</p>';
+              echo '</div>';
+            }
+          } else {
+            // No cars found
+            echo '<div class="message fail">No new cars found.</div>';
+          }
+
+          // Close the database connection
+          $conn->close();
+          ?>
+        </div>
+        </section>
+      </div>
+    </main>
+    <footer class="footer">
+      <div class="container grid grid--footer">
+        <div class="logo-col">
+          <a href="#" class="footer-logo">
+            <img class="logo" alt="AutoSales logo" src="img/auto-logo.png" />
+          </a>
+          <ul class="social-links">
+            <li>
+              <a class="footer-link" href="#"><ion-icon class="social-icon" name="logo-instagram"></ion-icon></a>
+            </li>
+            <li>
+              <a class="footer-link" href="#"><ion-icon class="social-icon" name="logo-facebook"></ion-icon></a>
+            </li>
+            <li>
+              <a class="footer-link" href="#"><ion-icon class="social-icon" name="logo-twitter"></ion-icon></a>
+            </li>
+          </ul>
+          <p class="copyright"> Copyright &copy; 2023 by AutoSales, Inc. All rights reserved. </p>
+        </div>
+        <div class="address-col">
+          <p class="footer-heading">Contact Us</p>
+          <address class="contacts">
+            <p class="address"> 123 Auto Drive, Suite 400, Car City, Sydney 90001 Australia </p>
+            <p>
+              <a class="footer-link" href="tel:555-123-4567">555-123-4567</a><br />
+              <a class="footer-link" href="mailto:sales@autosales.com">sales@autosales.com</a>
+            </p>
+          </address>
+        </div>
+        <nav class="nav-col">
+          <p class="footer-heading">Explore</p>
+          <ul class="footer-nav">
+            <li><a class="footer-link" href="#">New Cars</a></li>
+            <li><a class="footer-link" href="#">Used Cars</a></li>
+            <li><a class="footer-link" href="#">Special Offers</a></li>
+            <li><a class="footer-link" href="#">Finance Options</a></li>
+          </ul>
+        </nav>
+        <nav class="nav-col">
+          <p class="footer-heading">Company</p>
+          <ul class="footer-nav">
+            <li><a class="footer-link" href="#">About Us</a></li>
+            <li><a class="footer-link" href="#">Our Team</a></li>
+            <li><a class="footer-link" href="#">Careers</a></li>
+            <li><a class="footer-link" href="#">Testimonials</a></li>
+          </ul>
+        </nav>
+        <nav class="nav-col">
+          <p class="footer-heading">Support</p>
+          <ul class="footer-nav">
+            <li><a class="footer-link" href="#">Contact Support</a></li>
+            <li><a class="footer-link" href="#">FAQs</a></li>
+            <li><a class="footer-link" href="#">Privacy & Terms</a></li>
+          </ul>
+        </nav>
+      </div>
+    </footer>
+    <script>
+      function search_car() {
+        let input = document.getElementById('searchbar').value.toLowerCase();
+        let x = document.getElementsByClassName('cars');
+
+        for (let i = 0; i < x.length; i++) {
+          if (!x[i].innerHTML.toLowerCase().includes(input)) {
+            x[i].style.display = "none";
+          } else {
+            x[i].style.display = "block";
+          }
+        }
+
+        document.getElementById('searchbar').style.backgroundColor = "yellow";
+      }
+
+      // Additional script to revert color when not focused
+      document.getElementById("searchbar").addEventListener("blur", function () {
+        this.style.backgroundColor = "";
+      });
+    </script>
+  </body>
+
+</html>
